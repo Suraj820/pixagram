@@ -10,44 +10,62 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  double? _deviceHight, _deviceWidth;
-  late TextEditingController _userController = TextEditingController();
-  late TextEditingController _passController = TextEditingController();
+  double _deviceHeight = 0;
+  double _deviceWidth = 0;
+  late TextEditingController _userController;
+  late TextEditingController _passController;
   bool _isHidden = true;
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _userController = TextEditingController();
+    _passController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _userController.dispose();
+    _passController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _deviceHight = MediaQuery.of(context).size.height;
+    _deviceHeight = MediaQuery.of(context).size.height;
     _deviceWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            height: _deviceHight,
-            width: _deviceWidth,
-            padding: EdgeInsets.only(top: _deviceHight! * 0.02),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      _showLanguage(),
-                      _showLogo(),
-                      _userInput(),
-                      _passwordInput(),
-                      _submitButton(),
-                      _forgottenPassword(),
-                    ],
-                  ),
+    return Form(
+        key: _formKey,
+        child: Scaffold(
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Container(
+                height: _deviceHeight,
+                width: _deviceWidth,
+                padding: EdgeInsets.only(top: _deviceHeight! * 0.02),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _showLanguage(),
+                          _showLogo(),
+                          _userInput(),
+                          _passwordInput(),
+                          _submitButton(),
+                          _forgottenPassword(),
+                        ],
+                      ),
+                    ),
+                    _createNewAccount(),
+                  ],
                 ),
-                _createNewAccount(),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   Widget _showLanguage() {
@@ -60,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _showLogo() {
     return Container(
       margin: const EdgeInsets.only(top: 20.0),
-      height: _deviceHight! * 0.2,
+      height: _deviceHeight! * 0.2,
       width: _deviceWidth! * 0.2,
       child: SvgPicture.asset("assets/logo/Instagram.svg"),
     );
@@ -68,28 +86,34 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _userInput() {
     return Container(
-      height: _deviceHight! * 0.1,
+      height: _deviceHeight! * 0.1,
       margin: EdgeInsets.only(
           left: _deviceWidth! * 0.05,
           right: _deviceWidth! * 0.05,
-          top: _deviceHight! * 0.05),
-      child: TextField(
+          top: _deviceHeight! * 0.05),
+      child: TextFormField(
         controller: _userController,
         decoration: const InputDecoration(
             border: OutlineInputBorder(), labelText: "User name"),
         keyboardType: TextInputType.text,
+        validator: (_value){
+          if(_value == null || _value.isEmpty){
+            return "Please enter your username";
+          }
+          return null;
+        },
       ),
     );
   }
 
   Widget _passwordInput() {
     return Container(
-      height: _deviceHight! * 0.1,
+      height: _deviceHeight! * 0.1,
       margin: EdgeInsets.only(
           left: _deviceWidth! * 0.05,
           right: _deviceWidth! * 0.05,
-          top: _deviceHight! * 0.03),
-      child: TextField(
+          top: _deviceHeight! * 0.03),
+      child: TextFormField(
         obscureText: _isHidden,
         controller: _passController,
         decoration: InputDecoration(
@@ -104,6 +128,12 @@ class _LoginPageState extends State<LoginPage> {
               icon: Icon(_isHidden ? Icons.visibility : Icons.visibility_off)),
         ),
         keyboardType: TextInputType.visiblePassword,
+          validator: (_value){
+            if(_value == null || _value.isEmpty){
+              return "Please enter your username";
+            }
+            return null;
+          }
       ),
     );
   }
@@ -113,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
       margin: EdgeInsets.only(
           left: _deviceWidth! * 0.05,
           right: _deviceWidth! * 0.05,
-          top: _deviceHight! * 0.03),
+          top: _deviceHeight! * 0.03),
       width: _deviceWidth,
       decoration: BoxDecoration(
         color: Colors.blue,
@@ -133,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _forgottenPassword() {
     return Container(
-      margin: EdgeInsets.only(top: _deviceHight!*0.02),
+      margin: EdgeInsets.only(top: _deviceHeight!*0.02),
       child: GestureDetector(
         onTap: (){
 
@@ -154,22 +184,28 @@ class _LoginPageState extends State<LoginPage> {
       margin: EdgeInsets.only(
           left: _deviceWidth! * 0.05,
           right: _deviceWidth! * 0.05,
-          bottom: _deviceHight! * 0.03),
+          bottom: _deviceHeight! * 0.03),
       width: _deviceWidth,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(width: 1, color: Colors.blue)
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(width: 1, color: Colors.blue)
       ),
       child: MaterialButton(
-        onPressed: () {},
+        onPressed: () {
+          _createAccount();
+        },
         child: const Text(
           "Create new account",
           style: TextStyle(
-            color: Colors.blue
+              color: Colors.blue
           ),
         ),
       ),
     );
+  }
+
+  void _createAccount() {
+    Navigator.pushNamed(context, 'registration');
   }
 }
